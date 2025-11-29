@@ -1,4 +1,4 @@
-# Python cache files (automatically created when you run Python)
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
@@ -8,17 +8,17 @@ build/
 dist/
 *.egg-info/
 
-# Jupyter Notebook checkpoints (auto-saved versions)
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
 
-# Data files (too large for Git)
+# Data files
 data/cifar-10-batches-py/
 data/cifar-10-python.tar.gz
 data/*.npz
 *.npz
 
-# Result files (generated, not source code)
+# Result files
 results/features/*.npz
 results/diagrams/*.pkl
 results/figures/*.png
