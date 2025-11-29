@@ -59,7 +59,7 @@ def get_class_distribution(y, class_names):
     for i, name in enumerate(class_names):
         count = np.sum(y == i)
         percentage = 100 * count / len(y)
-        print(f"{name}: {count} samples ({percentage:.2f})%")
+        print(f"{name}: {count} samples ({percentage:.2f}%)")
 
 # Will help answer: is the dataset balanced? Did the train/validation/test split keep class proportions? Did stratification work?
 
