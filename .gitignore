@@ -1,0 +1,43 @@
+# Python cache files (automatically created when you run Python)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook checkpoints (auto-saved versions)
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Data files (too large for Git)
+data/cifar-10-batches-py/
+data/cifar-10-python.tar.gz
+data/*.npz
+*.npz
+
+# Result files (generated, not source code)
+results/features/*.npz
+results/diagrams/*.pkl
+results/figures/*.png
+results/figures/*.jpg
+
+# IDE/Editor files (personal settings)
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Operating system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
