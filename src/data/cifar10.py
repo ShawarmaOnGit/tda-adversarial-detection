@@ -51,3 +51,14 @@ def visualize_samples(images, labels, class_names, n_samples=9):
     
     plt.tight_layout()
     plt.show()
+
+
+# Check whether dataset is balanced
+def get_class_distribution(y, class_names):
+    print("Class Distribution:")
+    for i, name in enumerate(class_names):
+        count = np.sum(y == i)
+        percentage = 100 * count / len(y)
+        print(f"{name}: {count} samples ({percentage:.2f})%")
+
+# Will help answer: is the dataset balanced? Did the train/validation/test split keep class proportions? Did stratification work?
