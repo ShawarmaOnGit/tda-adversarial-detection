@@ -1,0 +1,18 @@
+tensorflow==2.16.1
+numpy==1.26.4
+scikit-learn==1.7.2
+
+# TDA
+ripser>=0.6.4
+persim>=0.3.5
+
+# Visualization
+matplotlib==3.10.3
+seaborn==0.12.0
+
+# Utilities
+tqdm==4.65.0
+
+# Jupyter
+jupyter==1.0.0
+ipykernel==7.1.0
