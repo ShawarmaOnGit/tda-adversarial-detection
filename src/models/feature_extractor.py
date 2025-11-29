@@ -37,4 +37,6 @@ class FeatureExtractor:
             pooling="avg"
         )
 
-        print(f"Model: {model_name.upper()} with feature dimensions of {self.feature_dim}")
+        print(f"Model: {model_name}")
+        print(f"Feature dimension: {self.feature_dim}")
+        print(f"Total parameters: {self.model.count_params():,}")
