@@ -9,6 +9,9 @@ def load_cifar10(validation_split=0.1):
     training_images = training_images / 255.
     testing_images = testing_images / 255.
 
+    training_labels = training_labels.flatten()
+    testing_labels = testing_labels.flatten()
+
     # Validation Split:
     training_images, validation_images, training_labels, validation_labels = train_test_split(
         training_images, training_labels, test_size=validation_split, random_state=111, shuffle=True, stratify=training_labels
