@@ -37,4 +37,4 @@ class FeatureExtractor:
             pooling="avg"
         )
 
-        print(f"Model: {model_name.upper()} with (feature_dim={self.feature_dim})")
+        print(f"Model: {model_name.upper()} with feature dimensions of {self.feature_dim}")
