@@ -38,3 +38,16 @@ CIFAR-10
 """
 
 
+def visualize_samples(images, labels, class_names, n_samples=9):
+    indices = np.random.choice(len(images), n_samples, replace=False)   # Random image position (a list)
+    grid_size = int(np.sqrt(n_samples))
+    fig, axes = plt.subplots(grid_size, grid_size, figsize=(8, 8))
+    axes = axes.flatten()
+    
+    for i, idx in enumerate(indices):
+        axes[i].imshow(images[idx])
+        axes[i].set_title(class_names[labels[idx]], fontsize=9)
+        axes[i].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
