@@ -127,3 +127,46 @@ def generate_fgsm_dataset(model, images, labels, epsilon=0.03, batch_size=128, v
 
     return adversarial_images, avg_success_rate
     # We took the original dataset, attack every image using FGSM, and return a NEW dataset of adversarial images
+
+if __name__ == "__main__":
+    print("\nFGSM Attack Initialized.......\n")
+    import sys
+    sys.path.append('../../')
+    from src.data.cifar10 import load_cifar10
+    
+    (train_images, train_labels), _, _, class_names = load_cifar10(validation_split=0.1)
+    test_images = train_images[:100]
+    test_labels = train_labels[:100]
+    
+    print(f"Test data shape: {test_images.shape}\n")
+    model = tf.keras.applications.ResNet50(
+        weights='imagenet',
+        include_top=True
+    )
+    print("Model loaded successfully\n")
+    print("Resizing images to 224x224 to match ResNet50 input size")
+    test_images_resized = tf.image.resize(test_images, (224, 224)).numpy()
+    print(f"Resized shape: {test_images_resized.shape}\n")
+    
+    attacker = FGSMAttack(model, epsilon=0.03)
+    
+    # Test 1: Single image attack
+    print("\n[Test 1] Single image attack initialized")
+    adv_image, perturbation = attacker.generate_single(
+        test_images_resized[0],
+        test_labels[0]
+    )
+    print(f"Generated adversarial example")
+    print(f"Perturbation range: [{perturbation.numpy().min():.4f}, {perturbation.numpy().max():.4f}]")
+    
+    # Test 2: Batch attack
+    print("\n[Test 2] Batch attack (10 images) initialized...")
+    adv_batch, pert_batch, success_rate = attacker.generate_batch(
+        test_images_resized[:10],
+        test_labels[:10],
+        verbose=True
+    )
+    
+    print("\n---End of Test---")
+    print("\nNote: Attack success rate will be since ResNet50 is trained on ImageNet (1000 classes). We're just testing to see if the code runs, not accuracy.")
+    print("\nIn the notebook, we'll attack a proper CIFAR-10 classifier and aim for success")
