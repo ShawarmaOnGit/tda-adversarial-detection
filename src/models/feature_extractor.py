@@ -40,3 +40,25 @@ class FeatureExtractor:
         print(f"Model: {model_name}")
         print(f"Feature dimension: {self.feature_dim}")
         print(f"Total parameters: {self.model.count_params():,}")
+
+
+
+    def extract_features(self, images, batch_size=128, resize_to=224, verbose=True):
+        all_features = []
+        iterator = range(0, len(images), batch_size)
+
+        if verbose:
+            iterator = tqdm(iterator, desc="Feature extraction in progress... ", unit="batch")
+
+        for i in iterator:
+            batch = images[i:i+batch_size]
+            batch = tf.image.resize(batch, (resize_to, resize_to))
+            batch = self.preprocess_fn(batch)
+            feature_vectors = self.model.predict(batch, verbose=0)   # Run the CNN for feature extraction (batch_size, feature_dim)
+            all_features.append(feature_vectors)
+        features = np.vstack(all_features)   # Combine to one big array, (N, feature_dim) s.t. N = total images
+
+        if verbose:
+            print(f"Features extracted: {features.shape}")
+
+        return features
