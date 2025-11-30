@@ -10,12 +10,12 @@ class FeatureExtractor:
     models = {
         "resnet50": {
             "model": tf.keras.applications.ResNet50,
-            "preprocess": tf.keras.applications.resnet50.preprocess_input,
+            "preprocess": tf.keras.applications.resnet.preprocess_input,
             "dim": 2048
         },
         "resnet101": {
             "model": tf.keras.applications.ResNet101,
-            "preprocess": tf.keras.applications.resnet101.preprocess_input,
+            "preprocess": tf.keras.applications.resnet.preprocess_input,
             "dim": 2048
         },
         "vgg16": {
@@ -37,7 +37,7 @@ class FeatureExtractor:
             pooling="avg"
         )
 
-        print(f"Model: {model_name}")
+        print(f"\nModel: {model_name}")
         print(f"Feature dimension: {self.feature_dim}")
         print(f"Total parameters: {self.model.count_params():,}")
 
@@ -48,7 +48,7 @@ class FeatureExtractor:
         iterator = range(0, len(images), batch_size)
 
         if verbose:
-            iterator = tqdm(iterator, desc="Feature extraction in progress... ", unit="batch")
+            iterator = tqdm(iterator, desc="\nFeature extraction in progress... ", unit="batch")
 
         for i in iterator:
             batch = images[i:i+batch_size]
@@ -59,7 +59,7 @@ class FeatureExtractor:
         features = np.vstack(all_features)   # Combine to one big array, (N, feature_dim) s.t. N = total images
 
         if verbose:
-            print(f"Extracted features from {features.shape[0]:,} images")
+            print(f"\nExtracted features from {features.shape[0]:,} images")
             print(f"Feature shape: {features.shape}")
             print(f"Feature range: [{features.min():.3f}, {features.max():.3f}]")
 
@@ -97,8 +97,8 @@ class DimensionalityReducer:
 
     def fit_transform(self, features, verbose=True):
         if verbose:
-            print("Applying PCA...")
-            print(f"\nOriginal feature dimension: {features.shape[1]}")
+            print("\nApplying PCA...")
+            print(f"Original feature dimension: {features.shape[1]}")
             print(f"Target dimension: {self.n_components}")
         reduced = self.pca.fit_transform(features)
         self.fitted = True
@@ -172,3 +172,42 @@ class DimensionalityReducer:
         indices = np.argsort(variances)[::-1][:n]
         
         return indices, variances[indices]
+    
+
+# Quick test:
+if __name__ == "__main__":
+    print("Testing Feature Extractor Module...\n")
+    
+    import sys
+    sys.path.append('../../')
+    from src.data.cifar10 import load_cifar10
+    
+    (training_images, training_labels), _, _, class_names = load_cifar10(validation_split=0.1)
+    
+    # Only 500 samples for this test:
+    test_images = training_images[:500]
+    test_labels = training_labels[:500]
+
+    print(f"\nTest data: {test_images.shape}\n")
+    
+    # Feature extraction
+    extractor = FeatureExtractor(model_name='resnet50')
+    features = extractor.extract_features(test_images, batch_size=32)
+    
+    # PCA reduction
+    reducer = DimensionalityReducer(n_components=50)
+    reduced_features = reducer.fit_transform(features)
+
+    # PCA variance explained plot
+    print("\nTesting PCA Variance Plot...\n")
+    reducer.plot_variance_explained()
+    
+    # Test save/load
+    extractor.save_features(features, test_labels, '../../results/features/test_features.npz')
+    loaded_features, loaded_labels = FeatureExtractor.load_features(
+        '../../results/features/test_features.npz'
+    )
+    
+    print(f"\nOriginal features: {features.shape}")
+    print(f"Reduced features: {reduced_features.shape}")
+    print(f"Loaded features: {loaded_features.shape}")
