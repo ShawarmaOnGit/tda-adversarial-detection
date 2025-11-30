@@ -59,6 +59,8 @@ class FeatureExtractor:
         features = np.vstack(all_features)   # Combine to one big array, (N, feature_dim) s.t. N = total images
 
         if verbose:
-            print(f"Features extracted: {features.shape}")
+            print(f"Extracted features from {features.shape[0]:,} images")
+            print(f"Feature shape: {features.shape}")
+            print(f"Feature range: [{features.min():.3f}, {features.max():.3f}]")
 
         return features
