@@ -77,7 +77,7 @@ class FeatureExtractor:
     def load_features(filepath, verbose=True):
         data = np.load(filepath)
         if verbose:
-            print(f"Loaded {filepath} — features: {data["features"].shape}, labels: {data["labels"].shape}")
+            print(f"Loaded {filepath} — features: {data['features'].shape}, labels: {data['labels'].shape}")
 
         return data["features"], data["labels"]
     
@@ -112,7 +112,7 @@ class DimensionalityReducer:
     
 
     def plot_variance_explained(self, save_path=None):
-        if not self.is_fitted:
+        if not self.fitted:
             raise ValueError("PCA must be fitted before plotting.")
 
         explained_variance = self.pca.explained_variance_ratio_
@@ -155,22 +155,19 @@ class DimensionalityReducer:
         ax2.set_ylabel('Cumulative Variance Explained', fontsize=12, fontweight='bold')
         ax2.set_title('Cumulative Variance Explained', fontsize=13, fontweight='bold')
         ax2.grid(alpha=0.3, linestyle='--')
-        ax2.legend()
-        
         plt.tight_layout()
         
         if save_path:
             plt.savefig(save_path, dpi=150, bbox_inches='tight')
-            print(f"✓ Saved variance plot to: {save_path}")
+            print(f"Saved variance plot to: {save_path}")
         
         plt.show()
 
 
     # Get indices of top N principal components by variance explained:
     def get_top_components(self, n=3):
-        if not self.is_fitted:
+        if not self.fitted:
             raise ValueError("PCA must be fitted first.")
-        
         variances = self.pca.explained_variance_ratio_
         indices = np.argsort(variances)[::-1][:n]
         
