@@ -64,3 +64,16 @@ class FeatureExtractor:
             print(f"Feature range: [{features.min():.3f}, {features.max():.3f}]")
 
         return features
+
+
+
+    def save_features(self, features, labels, filepath):
+        np.savez_compressed(filepath, features=features, labels=labels)   # Load next time with 'data = np.load("file.npz")'
+        print(f"Features saved to {filepath}")
+
+
+    
+    @staticmethod
+    def load_features(filepath):
+        data = np.load(filepath)
+        return data["features"], data["labels"]
