@@ -76,4 +76,7 @@ class FeatureExtractor:
     @staticmethod
     def load_features(filepath):
         data = np.load(filepath)
+        if verbose:
+            print(f"Loaded {filepath} — features: {data["features"].shape}, labels: {data["labels"].shape}")
+            
         return data["features"], data["labels"]
