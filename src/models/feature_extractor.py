@@ -74,9 +74,104 @@ class FeatureExtractor:
 
     
     @staticmethod
-    def load_features(filepath):
+    def load_features(filepath, verbose=True):
         data = np.load(filepath)
         if verbose:
             print(f"Loaded {filepath} — features: {data["features"].shape}, labels: {data["labels"].shape}")
-            
+
         return data["features"], data["labels"]
+    
+
+
+class DimensionalityReducer:
+    """
+    Goal: Reduce feature dimensionality using PCA.
+    High-dimensional features (2048-dim) are computationally expensive for TDA. 
+    So, we use PCA to reduce dimensionality while also preserving most variance.
+    """
+    def __init__(self, n_components=50, random_state=42):
+        self.n_components = n_components
+        self.pca = PCA(n_components=n_components, random_state=random_state)
+        self.fitted = False
+    
+
+    def fit_transform(self, features, verbose=True):
+        if verbose:
+            print("Applying PCA...")
+            print(f"\nOriginal feature dimension: {features.shape[1]}")
+            print(f"Target dimension: {self.n_components}")
+        reduced = self.pca.fit_transform(features)
+        self.fitted = True
+        return reduced
+
+
+    def transform(self, features):
+        if not self.fitted:
+            raise ValueError("Call fit_transform() before transform().")
+        return self.pca.transform(features)
+    
+
+    def plot_variance_explained(self, save_path=None):
+        if not self.is_fitted:
+            raise ValueError("PCA must be fitted before plotting.")
+
+        explained_variance = self.pca.explained_variance_ratio_
+        cumulative_variance = np.cumsum(explained_variance)
+        num_components = len(explained_variance)
+
+        # Find components at each threshold to get an understanding whether or not correct number was chosen
+        threshold_90 = np.searchsorted(cumulative_variance, 0.90) + 1
+        threshold_95 = np.searchsorted(cumulative_variance, 0.95) + 1
+        threshold_99 = np.searchsorted(cumulative_variance, 0.99) + 1
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # Individual variance
+        ax1.bar(range(1, len(explained_variance) + 1), explained_variance, 
+                color='steelblue', alpha=0.7, edgecolor='navy')
+        ax1.set_xlabel('Principal Component', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('Variance Explained', fontsize=12, fontweight='bold')
+        ax1.set_title('Variance Explained by Each Component', fontsize=13, fontweight='bold')
+        ax1.grid(alpha=0.3, linestyle='--')
+        
+        # Cumulative variance
+        ax2.plot(range(1, len(cumulative_variance) + 1), cumulative_variance, 
+                 'o-', color='darkgreen', linewidth=2, markersize=4)
+        
+        # Each threshold
+        # 90%
+        ax2.axhline(y=0.90, color='red', linestyle='--', linewidth=1)
+        ax2.text(num_components * 0.85, 0.91, f"90% ({threshold_90} comps)", color='red')
+
+        # 95%
+        ax2.axhline(y=0.95, color='red', linestyle='--', linewidth=1)
+        ax2.text(num_components * 0.85, 0.96, f"95% ({threshold_95} comps)", color='red')
+
+        # 99%
+        ax2.axhline(y=0.99, color='red', linestyle='--', linewidth=1)
+        ax2.text(num_components * 0.85, 1.00, f"99% ({threshold_99} comps)", color='red')
+
+        ax2.set_xlabel('Number of Components', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Cumulative Variance Explained', fontsize=12, fontweight='bold')
+        ax2.set_title('Cumulative Variance Explained', fontsize=13, fontweight='bold')
+        ax2.grid(alpha=0.3, linestyle='--')
+        ax2.legend()
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=150, bbox_inches='tight')
+            print(f"✓ Saved variance plot to: {save_path}")
+        
+        plt.show()
+
+
+    # Get indices of top N principal components by variance explained:
+    def get_top_components(self, n=3):
+        if not self.is_fitted:
+            raise ValueError("PCA must be fitted first.")
+        
+        variances = self.pca.explained_variance_ratio_
+        indices = np.argsort(variances)[::-1][:n]
+        
+        return indices, variances[indices]
