@@ -21,8 +21,6 @@ data/*.npz
 # Result files
 results/features/*.npz
 results/diagrams/*.pkl
-results/figures/*.png
-results/figures/*.jpg
 
 # IDE/Editor files (personal settings)
 .vscode/
