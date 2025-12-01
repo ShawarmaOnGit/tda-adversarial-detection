@@ -27,7 +27,7 @@ def compute_persistence(points, maxdim=1, verbose=True):
     if verbose:
         print(f"Computing persistence for {points.shape[0]} points in {points.shape[1]}D:")
     
-    result = ripser(points, maxdim=maxdim, verbose=False)
+    result = ripser(points, maxdim=maxdim)
     if verbose:
         print(f"Persistence computed")
         print(f"H0 features: {len(result['dgms'][0])}")
@@ -114,3 +114,29 @@ def compute_betti_numbers(diagram, epsilon_range=None):
         betti_numbers.append(alive)
     
     return epsilon_range, np.array(betti_numbers)
+
+
+# Testing:
+if __name__ == "__main__":
+    print("\nTesting of Persistence Module started\n")
+    
+    np.random.seed(111)
+    points = np.random.randn(100, 10)        # 100 points in 10D
+    print(f"Test data: {points.shape}\n")
+    result = compute_persistence(points, maxdim=1, verbose=True)
+    print("\nH0 (Connected Components) Stats:")
+    h0_stats = get_persistence_stats(result['dgms'][0])
+    print(f"Number of features: {h0_stats['n_features']}")
+    print(f"Total persistence:  {h0_stats['total_persistence']:.4f}")
+    print(f"Mean persistence:   {h0_stats['mean_persistence']:.4f}")
+    
+    print("\nH1 (Loops) Stats:")
+    h1_stats = get_persistence_stats(result['dgms'][1])
+    print(f"Number of features: {h1_stats['n_features']}")
+    print(f"Total persistence:  {h1_stats['total_persistence']:.4f}")
+    
+    print("\nTesting save/load:")
+    save_diagrams(result, '../../results/diagrams/test_diagram.pkl')
+    loaded = load_diagrams('../../results/diagrams/test_diagram.pkl')
+    
+    print("\nAll tests passed")
