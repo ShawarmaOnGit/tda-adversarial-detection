@@ -75,3 +75,40 @@ class PersistenceImageGenerator:
             print(f"Birth range: [{self.birth_range[0]:.4f}, {self.birth_range[1]:.4f}]")
             print(f"Persistence range: [{self.pers_range[0]:.4f}, {self.pers_range[1]:.4f}]")
             print(f"Image resolution: {self.resolution}x{self.resolution}")
+
+    def transform(self, diagram):
+        """
+        Convert one persistence diagram into a persistence image.
+        """
+        if not self.fitted:
+            raise ValueError("Call fit() before transform().")
+
+        # Remove infinite death points
+        finite_diagram = diagram[diagram[:, 1] < np.inf]
+
+        # If nothing to map → return empty image
+        if len(finite_diagram) == 0:
+            return np.zeros((self.resolution, self.resolution))
+
+        births = finite_diagram[:, 0]
+        deaths = finite_diagram[:, 1]
+        persistences = deaths - births
+
+        birth_bins = np.linspace(self.birth_range[0], self.birth_range[1], self.resolution + 1)
+        pers_bins = np.linspace(self.pers_range[0], self.pers_range[1], self.resolution + 1)
+
+        image = np.zeros((self.resolution, self.resolution))      # Empty image
+
+        birth_centers = (birth_bins[:-1] + birth_bins[1:]) / 2    # Centers of grid cells (for Gaussian distance)
+        pers_centers = (pers_bins[:-1] + pers_bins[1:]) / 2
+
+        # Build the image
+        for b, p in zip(births, persistences):
+            weight = p                 # lifetime
+            for i in range(self.resolution):
+                for j in range(self.resolution):
+                    dist_sq = (b - birth_centers[i])**2 + (p - pers_centers[j])**2
+                    gaussian = np.exp(-dist_sq / (2 * self.sigma**2))
+                    image[j, i] += weight * gaussian
+
+        return image
