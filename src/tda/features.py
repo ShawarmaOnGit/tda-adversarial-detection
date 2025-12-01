@@ -35,7 +35,12 @@ class PersistenceImageGenerator:
 
     def fit(self, diagrams_list, verbose=True):
         """
-        Fit the image generator to determine appropriate ranges.
+        This function looks at a bunch of persistence diagrams and figures out:
+          - the smallest and largest birth values
+          - the largest persistence value (death - birth)
+        It saves these as the ranges so the persistence images know how wide/tall the x/y-axis should be
+        In short, it learns the coordinate ranges needed to build persistence images.
+
         diagrams_list: List of persistence diagrams (each is Nx2 array)
         """
         if verbose:
@@ -46,18 +51,18 @@ class PersistenceImageGenerator:
         
         for diagram in diagrams_list:
             finite_diagram = diagram[diagram[:, 1] < np.inf]
-            if len(finite_diagram) > 0:
-                births = finite_diagram[:, 0]
-                deaths = finite_diagram[:, 1]
-                persistences = deaths - births
-                
-                all_births.extend(births)
-                all_persistences.extend(persistences)
+            if len(finite_diagram) == 0:
+                continue
+            births = finite_diagram[:, 0]
+            deaths = finite_diagram[:, 1]
+            persistences = deaths - births
+            
+            all_births.extend(births)
+            all_persistences.extend(persistences)
         
         if len(all_births) == 0:
-            raise ValueError("No finite persistence pairs found in diagrams")
+            raise ValueError("No finite points found in diagrams")
         
-        # Set ranges if not provided
         if self.birth_range is None:
             self.birth_range = (min(all_births), max(all_births))
         
