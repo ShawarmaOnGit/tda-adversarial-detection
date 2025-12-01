@@ -129,3 +129,80 @@ class PersistenceImageGenerator:
             images.append(self.transform(diagram))
 
         return np.array(images)
+    
+
+class BettiCurveGenerator:
+    """
+    Generate Betti curves from persistence diagrams.
+    """
+    def __init__(self, n_bins=100, epsilon_range=None):
+        """
+        n_bins: number of epsilon values
+        epsilon_range: (min, max) for epsilon axis
+        """
+        self.n_bins = n_bins
+        self.epsilon_range = epsilon_range
+        self.fitted = False
+
+    
+    def fit(self, diagrams_list, verbose=True):
+        """
+        Find epsilon range (0 to max death) from a list of diagrams (largest death value)
+        """
+        if verbose:
+            print(f"\nFitting to {len(diagrams_list)} diagrams")
+
+        all_deaths = []
+        for diagram in diagrams_list:
+            finite_diagram = diagram[diagram[:, 1] < np.inf]
+            if len(finite_diagram) > 0:
+                all_deaths.extend(finite_diagram[:, 1])
+
+        if not all_deaths:
+            raise ValueError("No finite points found.")
+
+        if self.epsilon_range is None:
+            self.epsilon_range = (0, max(all_deaths))
+
+        self.epsilons = np.linspace(self.epsilon_range[0], self.epsilon_range[1], self.n_bins)
+        self.fitted = True
+
+
+    def transform(self, diagram):
+        """
+        Convert one diagram into a Betti curve.
+        """
+        if not self.fitted:
+            raise ValueError("Call fit() before transform().")
+
+        finite_diagram = diagram[diagram[:, 1] < np.inf]
+
+        if len(finite_diagram) == 0:
+            return np.zeros(self.n_bins)
+
+        births = finite_diagram[:, 0]
+        deaths = finite_diagram[:, 1]
+        betti = []
+        for eps in self.epsilons:
+            alive_count = np.sum((births <= eps) & (eps < deaths))
+            betti.append(alive_count)
+
+        return np.array(betti)
+
+
+    def fit_transform(self, diagrams_list, verbose=True):
+        """
+        Fit on all diagrams, then convert each to a Betti curve.
+        """
+        self.fit(diagrams_list, verbose=verbose)
+
+        curves = []
+        items = diagrams_list
+
+        if verbose:
+            items = tqdm(diagrams_list, desc="Generating Betti curves")
+
+        for diagram in items:
+            curves.append(self.transform(diagram))
+
+        return np.array(curves)
