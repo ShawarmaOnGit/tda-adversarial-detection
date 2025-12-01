@@ -110,5 +110,22 @@ class PersistenceImageGenerator:
                     dist_sq = (b - birth_centers[i])**2 + (p - pers_centers[j])**2
                     gaussian = np.exp(-dist_sq / (2 * self.sigma**2))
                     image[j, i] += weight * gaussian
-
         return image
+    
+
+    def fit_transform(self, diagrams_list, verbose=True):
+        """
+        Learn ranges from diagrams, then convert each to a persistence image.
+        """
+        self.fit(diagrams_list, verbose=verbose)
+        images = []
+
+        if verbose:
+            items = tqdm(diagrams_list, desc="Generating persistence images")
+        else:
+            items = diagrams_list
+
+        for diagram in items:
+            images.append(self.transform(diagram))
+
+        return np.array(images)
