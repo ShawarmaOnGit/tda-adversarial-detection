@@ -232,3 +232,30 @@ def extract_persistence_statistics(diagram):
         'max_persistence': float(lifetimes.max()),
         'std_persistence': float(lifetimes.std())
     }
+
+
+def extract_all_statistics(diagrams_list, verbose=True):
+    """
+    Extract persistence statistics for a list of diagrams (batch wrapper for extract_persistence_statistics())
+    """
+    all_stats = {
+        'n_features': [],
+        'total_persistence': [],
+        'mean_persistence': [],
+        'max_persistence': [],
+        'std_persistence': []
+    }
+
+    items = diagrams_list
+    if verbose:
+        items = tqdm(diagrams_list, desc="Extracting statistics")
+
+    for diagram in items:
+        stats = extract_persistence_statistics(diagram)
+        for key in all_stats:
+            all_stats[key].append(stats[key])
+
+    for key in all_stats:
+        all_stats[key] = np.array(all_stats[key])
+
+    return all_stats
