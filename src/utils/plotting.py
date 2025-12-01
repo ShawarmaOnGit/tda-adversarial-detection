@@ -139,3 +139,26 @@ def compare_persistence_diagrams(diagram1, diagram2, label1="Clean", label2="Adv
         print(f"Saved to {save_path}")
 
     plt.show()
+
+
+def compare_betti_curves(epsilons1, betti1, epsilons2, betti2, label1="Clean", label2="Adversarial", title="Betti Curve Comparison", save_path=None):
+    """
+    Plot two Betti curves for comparison.
+    """
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    ax.plot(epsilons1, betti1, color="blue", label=label1)
+    ax.fill_between(epsilons1, betti1, color="blue", alpha=0.2)
+    ax.plot(epsilons2, betti2, color="red", label=label2)
+    ax.fill_between(epsilons2, betti2, color="red", alpha=0.2)
+    ax.set_xlabel("Epsilon")
+    ax.set_ylabel("Betti Number")
+    ax.set_title(title)
+    ax.legend()
+    ax.grid(alpha=0.3, linestyle="--")
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"Saved to {save_path}")
+    plt.show()
