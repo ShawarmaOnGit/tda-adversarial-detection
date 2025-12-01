@@ -43,3 +43,15 @@ def save_diagrams(diagrams, filepath):
     with open(filepath, 'wb') as f:
         pickle.dump(diagrams, f)
     print(f"Saved diagrams in {filepath}")
+
+
+def load_diagrams(filepath):
+    """
+    Load persistence diagrams from disk.
+    filepath in .pkl format
+    diagrams: Loaded diagrams
+    """
+    with open(filepath, 'rb') as f:
+        diagrams = pickle.load(f)
+    print(f"Loaded diagrams from {filepath}")
+    return diagrams
