@@ -85,3 +85,57 @@ def plot_persistence_image(image, title="Persistence Image", save_path=None, cma
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         print(f"Saved to {save_path}")
     plt.show()
+
+
+def compare_persistence_diagrams(diagram1, diagram2, label1="Clean", label2="Adversarial", title="Persistence Diagram Comparison", save_path=None):
+    """
+    Plot two persistence diagrams side by side.
+    """
+    finite_diagram1 = diagram1[diagram1[:, 1] < np.inf]
+    finite_diagram2 = diagram2[diagram2[:, 1] < np.inf]
+
+    if len(finite_diagram1) == 0 and len(finite_diagram2) == 0:
+        print("No finite points in either diagram.")
+        return
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
+
+    # --- Left diagram ---
+    if len(finite_diagram1) > 0:
+        b1, e1 = finite_diagram1[:, 0], finite_diagram1[:, 1]
+        p1 = e1 - b1
+        sc1 = ax1.scatter(b1, e1, c=p1, cmap="Blues", s=30, alpha=0.6,
+                          edgecolors="black", linewidth=0.4)
+        m1 = max(b1.max(), e1.max())
+        ax1.plot([0, m1], [0, m1], "r--", linewidth=1.5)
+        plt.colorbar(sc1, ax=ax1, label="Persistence")
+
+    ax1.set_title(label1)
+    ax1.set_xlabel("Birth")
+    ax1.set_ylabel("Death")
+    ax1.grid(alpha=0.3, linestyle="--")
+    ax1.set_aspect("equal")
+
+    # --- Right diagram ---
+    if len(finite_diagram2) > 0:
+        b2, e2 = finite_diagram2[:, 0], finite_diagram2[:, 1]
+        p2 = e2 - b2
+        sc2 = ax2.scatter(b2, e2, c=p2, cmap="Reds", s=30, alpha=0.6,
+                          edgecolors="black", linewidth=0.4)
+        m2 = max(b2.max(), e2.max())
+        ax2.plot([0, m2], [0, m2], "r--", linewidth=1.5)
+        plt.colorbar(sc2, ax=ax2, label="Persistence")
+
+    ax2.set_title(label2)
+    ax2.set_xlabel("Birth")
+    ax2.set_ylabel("Death")
+    ax2.grid(alpha=0.3, linestyle="--")
+    ax2.set_aspect("equal")
+    plt.suptitle(title)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"Saved to {save_path}")
+
+    plt.show()
