@@ -162,3 +162,44 @@ def compare_betti_curves(epsilons1, betti1, epsilons2, betti2, label1="Clean", l
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
         print(f"Saved to {save_path}")
     plt.show()
+
+
+def plot_statistics_comparison(stats1, stats2, label1="Clean", label2="Adversarial", title="Topological Statistics Comparison", save_path=None):
+    """
+    Compare persistence statistics between two datasets using boxplots.
+    """
+    metrics = ["n_features", "total_persistence", "mean_persistence", "max_persistence", "std_persistence"]
+    labels = ["Num Features", "Total Pers.", "Mean Pers.", "Max Pers.", "Std Pers."]
+
+    fig, axes = plt.subplots(2, 3, figsize=(16, 10))
+    axes = axes.flatten()
+
+    for i, (metric, lab) in enumerate(zip(metrics, labels)):
+        ax = axes[i]
+        data1 = stats1[metric]
+        data2 = stats2[metric]
+        
+        # Box plots
+        bp = ax.boxplot([data1, data2],
+                        positions=[1, 2],
+                        widths=0.6,
+                        patch_artist=True,
+                        showmeans=True)
+
+        # Color the boxes
+        bp["boxes"][0].set_facecolor("lightblue")
+        bp["boxes"][1].set_facecolor("lightcoral")
+        ax.set_xticks([1, 2])
+        ax.set_xticklabels([label1, label2])
+        ax.set_ylabel(lab)
+        ax.grid(axis="y", alpha=0.3, linestyle="--")
+
+    # Remove last empty subplot
+    fig.delaxes(axes[5])
+
+    plt.suptitle(title)
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"Saved to {save_path}")
+    plt.show()
