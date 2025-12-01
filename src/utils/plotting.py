@@ -46,3 +46,23 @@ def plot_persistence_diagram(diagram, title="Persistence Diagram", save_path=Non
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         print(f"Saved to {save_path}")
     plt.show()
+
+
+def plot_betti_curve(epsilons, betti_numbers, title="Betti Curve", save_path=None, color='darkgreen', linewidth=2):
+    """
+    Plot a Betti curve (features alive vs epsilon).
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.plot(epsilons, betti_numbers, color=color, linewidth=linewidth)
+    ax.fill_between(epsilons, betti_numbers, color=color, alpha=0.3)
+    ax.set_xlabel("Epsilon")
+    ax.set_ylabel("Betti Number")
+    ax.set_title(title)
+    ax.grid(alpha=0.3, linestyle="--")
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"Saved to {save_path}")
+    plt.show()
