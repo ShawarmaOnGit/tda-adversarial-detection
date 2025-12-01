@@ -66,3 +66,22 @@ def plot_betti_curve(epsilons, betti_numbers, title="Betti Curve", save_path=Non
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
         print(f"Saved to {save_path}")
     plt.show()
+
+
+def plot_persistence_image(image, title="Persistence Image", save_path=None, cmap='hot'):
+    """
+    Plot a persistence image as a heatmap.
+    """
+    fig, ax = plt.subplots(figsize=(8, 7))
+
+    im = ax.imshow(image, cmap=cmap, origin='lower', aspect='auto')
+    plt.colorbar(im, ax=ax, label="Weight")
+    ax.set_xlabel("Birth")
+    ax.set_ylabel("Persistence")
+    ax.set_title(title)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        print(f"Saved to {save_path}")
+    plt.show()
