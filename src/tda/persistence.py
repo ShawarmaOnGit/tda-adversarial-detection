@@ -55,3 +55,33 @@ def load_diagrams(filepath):
         diagrams = pickle.load(f)
     print(f"Loaded diagrams from {filepath}")
     return diagrams
+
+
+def get_persistence_stats(diagram):
+    """
+    diagram: numpy array of shape (N, 2) where each row is (birth, death) pair.
+      - A birth-death pair tells you when a shape appears and disappears as you zoom out through the data
+    """
+    # Remove infinite death times
+    finite_diagram = diagram[diagram[:, 1] < np.inf]
+    
+    if len(finite_diagram) == 0:
+        return {
+            'n_features': 0,
+            'total_persistence': 0,
+            'mean_persistence': 0,
+            'max_persistence': 0,
+            'lifetimes': np.array([])
+        }
+    
+    lifetimes = finite_diagram[:, 1] - finite_diagram[:, 0]   # lifetimes = death - birth
+    
+    stats = {
+        'n_features': len(finite_diagram),
+        'total_persistence': lifetimes.sum(),
+        'mean_persistence': lifetimes.mean(),
+        'max_persistence': lifetimes.max(),
+        'lifetimes': lifetimes
+    }
+    
+    return stats
