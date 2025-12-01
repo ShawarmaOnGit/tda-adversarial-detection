@@ -206,3 +206,29 @@ class BettiCurveGenerator:
             curves.append(self.transform(diagram))
 
         return np.array(curves)
+    
+
+def extract_persistence_statistics(diagram):
+    """
+    Computes and basic statistics (count, sum, mean, max, std) of lifetimes    
+    """
+    finite_diagram = diagram[diagram[:, 1] < np.inf]
+    
+    if len(finite_diagram) == 0:
+        return {
+            'n_features': 0,
+            'total_persistence': 0.0,
+            'mean_persistence': 0.0,
+            'max_persistence': 0.0,
+            'std_persistence': 0.0
+        }
+    
+    lifetimes = finite_diagram[:, 1] - finite_diagram[:, 0]
+    
+    return {
+        'n_features': len(finite_diagram),
+        'total_persistence': float(lifetimes.sum()),
+        'mean_persistence': float(lifetimes.mean()),
+        'max_persistence': float(lifetimes.max()),
+        'std_persistence': float(lifetimes.std())
+    }
