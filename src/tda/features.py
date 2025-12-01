@@ -259,3 +259,45 @@ def extract_all_statistics(diagrams_list, verbose=True):
         all_stats[key] = np.array(all_stats[key])
 
     return all_stats
+
+
+# Quick test
+if __name__ == "__main__":
+    print("\nTesting TDA Features Module started...\n")
+    
+    np.random.seed(111)
+    n_diagrams = 100
+    diagrams_list = []
+    
+    for _ in range(n_diagrams):
+        n_points = np.random.randint(10, 50)
+        births = np.random.rand(n_points)
+        persistences = np.random.rand(n_points) * 0.5
+        deaths = births + persistences
+        diagram = np.column_stack([births, deaths])
+        diagrams_list.append(diagram)
+    
+    print(f"Created {len(diagrams_list)} synthetic diagrams\n")
+    
+    # Test Persistence Images
+    print("\nTesting Persistence Images...")
+    pi_gen = PersistenceImageGenerator(resolution=20, sigma=0.1)
+    persistence_images = pi_gen.fit_transform(diagrams_list, verbose=True)
+    print(f"\nGenerated persistence images: {persistence_images.shape}")
+    print(f"Image range: [{persistence_images.min():.4f}, {persistence_images.max():.4f}]")
+    
+    # Test Betti Curves
+    print("\nTesting Betti Curves")
+    bc_gen = BettiCurveGenerator(n_bins=100)
+    betti_curves = bc_gen.fit_transform(diagrams_list, verbose=True)
+    print(f"\nGenerated Betti curves of shape: {betti_curves.shape}")
+    print(f"Curve range: [{betti_curves.min():.0f}, {betti_curves.max():.0f}]")
+    
+    # Test Statistics
+    print("\nTesting Statistical Features...")
+    stats = extract_all_statistics(diagrams_list, verbose=True)
+    print(f"\nStatistics extracted:")
+    for key, values in stats.items():
+        print(f"{key}: mean={values.mean():.4f}, std={values.std():.4f}")
+    
+    print("\nAll tests passed!")
