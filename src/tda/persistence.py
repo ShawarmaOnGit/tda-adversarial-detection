@@ -85,3 +85,32 @@ def get_persistence_stats(diagram):
     }
     
     return stats
+
+
+def compute_betti_numbers(diagram, epsilon_range=None):
+    """
+    This will compute Betti numbers, which is the number of features alive at a given scale
+    A feature is alive if birth ≤ epsilon < death
+
+    diagram: Persistence diagram (N, 2)
+    epsilon_range: Range of epsilon values to evaluat   
+    Returns:
+      - epsilons: Array of epsilon values
+      - betti_numbers: Betti numbers at each epsilon
+    """
+    finite_diagram = diagram[diagram[:, 1] < np.inf]
+    
+    if len(finite_diagram) == 0:
+        return np.array([0]), np.array([0])
+    
+    if epsilon_range is None:                    # If no range given, choose a simple one
+        max_death = finite_diagram[:, 1].max()
+        epsilon_range = np.linspace(0, max_death, 100)
+    
+    betti_numbers = []
+    
+    for eps in epsilon_range:
+        alive = np.sum(((finite_diagram[:, 0] <= eps) & (finite_diagram[:, 1] > eps)))   # alive if birth ≤ epsilon < death
+        betti_numbers.append(alive)
+    
+    return epsilon_range, np.array(betti_numbers)
