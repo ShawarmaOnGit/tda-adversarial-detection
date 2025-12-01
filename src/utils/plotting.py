@@ -203,3 +203,60 @@ def plot_statistics_comparison(stats1, stats2, label1="Clean", label2="Adversari
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
         print(f"Saved to {save_path}")
     plt.show()
+
+
+# Quick test
+if __name__ == "__main__":
+    print("\nTesting TDA Plotting Module...\n")
+    
+    np.random.seed(111)
+    n_points = 100
+    births = np.random.rand(n_points)
+    persistences = np.random.rand(n_points) * 0.5
+    deaths = births + persistences
+    diagram1 = np.column_stack([births, deaths])
+    
+    # Create second diagram (slightly different)
+    births2 = np.random.rand(n_points) * 1.1
+    persistences2 = np.random.rand(n_points) * 0.6
+    deaths2 = births2 + persistences2
+    diagram2 = np.column_stack([births2, deaths2])
+    
+    print("Testing plot_persistence_diagram...")
+    plot_persistence_diagram(diagram1, title="Test Persistence Diagram")
+    
+    print("\nTesting compare_persistence_diagrams...")
+    compare_persistence_diagrams(diagram1, diagram2, label1="Dataset 1", label2="Dataset 2")
+    
+    print("\nTesting Betti curve plots...")
+    epsilons = np.linspace(0, 1.5, 100)
+    betti1 = np.random.randint(0, 50, 100)
+    betti2 = np.random.randint(0, 60, 100)
+    
+    plot_betti_curve(epsilons, betti1, title="Test Betti Curve")
+    print("\nTesting compare_betti_curves...")
+    compare_betti_curves(epsilons, betti1, epsilons, betti2)
+    
+    print("\nTesting persistence image plot...")
+    image = np.random.rand(20, 20)
+    plot_persistence_image(image, title="Test Persistence Image")
+    
+    print("\nTesting statistics comparison...")
+    stats1 = {
+        'n_features': np.random.randint(10, 100, 50),
+        'total_persistence': np.random.rand(50) * 10,
+        'mean_persistence': np.random.rand(50),
+        'max_persistence': np.random.rand(50) * 2,
+        'std_persistence': np.random.rand(50) * 0.5
+    }
+    stats2 = {
+        'n_features': np.random.randint(15, 120, 50),
+        'total_persistence': np.random.rand(50) * 12,
+        'mean_persistence': np.random.rand(50) * 1.2,
+        'max_persistence': np.random.rand(50) * 2.5,
+        'std_persistence': np.random.rand(50) * 0.6
+    }
+    
+    plot_statistics_comparison(stats1, stats2)
+    
+    print("\nAll tests passed!")
