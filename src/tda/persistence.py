@@ -33,3 +33,13 @@ def compute_persistence(points, maxdim=1, verbose=True):
         print(f"H0 features: {len(result['dgms'][0])}")
         print(f"H1 features: {len(result['dgms'][1])}")
     return result
+
+
+def save_diagrams(diagrams, filepath):
+    """
+    Save persistence diagrams to disk.
+    diagrams: The output from ripser()
+    """
+    with open(filepath, 'wb') as f:
+        pickle.dump(diagrams, f)
+    print(f"Saved diagrams in {filepath}")
