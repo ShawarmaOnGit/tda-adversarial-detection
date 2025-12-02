@@ -130,38 +130,38 @@ class PGDAttack:
        return adv_images, final_perturbation
   
 
-    def generate_pgd_dataset(model, images, labels, epsilon=0.03, alpha=0.01, num_steps=10, batch_size=128, verbose=True):
-       """
-       Convenience function to generate PGD adversarial dataset.
-       """
-       attacker = PGDAttack(model, epsilon=epsilon, alpha=alpha, num_steps=num_steps)
-      
-       all_adversarial = []
-       total_success = 0
-       n_batches = 0
-       if verbose:
-           iterator = tqdm(range(0, len(images), batch_size), desc="Generating PGD attacks")
-       else:
-           iterator = range(0, len(images), batch_size)
-      
-       for i in iterator:
-           batch_images = images[i:i+batch_size]
-           batch_labels = labels[i:i+batch_size]
-           adv_batch, _, success = attacker.generate_batch(batch_images, batch_labels, verbose=False)
-          
-           all_adversarial.append(adv_batch)
-           total_success += success
-           n_batches += 1
-      
-       adversarial_images = np.vstack(all_adversarial)
-       avg_success_rate = total_success / n_batches
-      
-       if verbose:
-           print(f"\nPGD dataset complete")
-           print(f"Total samples: {len(adversarial_images)}")
-           print(f"Average attack success rate: {avg_success_rate:.2%}")
-      
-       return adversarial_images, avg_success_rate
+def generate_pgd_dataset(model, images, labels, epsilon=0.03, alpha=0.01, num_steps=10, batch_size=128, verbose=True):
+    """
+    Convenience function to generate PGD adversarial dataset.
+    """
+    attacker = PGDAttack(model, epsilon=epsilon, alpha=alpha, num_steps=num_steps)
+    
+    all_adversarial = []
+    total_success = 0
+    n_batches = 0
+    if verbose:
+        iterator = tqdm(range(0, len(images), batch_size), desc="Generating PGD attacks")
+    else:
+        iterator = range(0, len(images), batch_size)
+    
+    for i in iterator:
+        batch_images = images[i:i+batch_size]
+        batch_labels = labels[i:i+batch_size]
+        adv_batch, _, success = attacker.generate_batch(batch_images, batch_labels, verbose=False)
+        
+        all_adversarial.append(adv_batch)
+        total_success += success
+        n_batches += 1
+    
+    adversarial_images = np.vstack(all_adversarial)
+    avg_success_rate = total_success / n_batches
+    
+    if verbose:
+        print(f"\nPGD dataset complete")
+        print(f"Total samples: {len(adversarial_images)}")
+        print(f"Average attack success rate: {avg_success_rate:.2%}")
+    
+    return adversarial_images, avg_success_rate
    
    
 # Quick test
