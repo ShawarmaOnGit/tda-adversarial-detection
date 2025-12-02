@@ -13,7 +13,6 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 
-
 class PGDAttack:
     """
     Projected Gradient Descent (PGD) adversarial attack.
@@ -23,16 +22,9 @@ class PGDAttack:
     2. Projects back to epsilon ball after each step
     3. Much stronger than single-step FGSM
     """
-    
     def __init__(self, model, epsilon=0.03, alpha=0.01, num_steps=10):
         """
         Initialize PGD attack.
-        
-        Args:
-            model: TensorFlow/Keras model to attack
-            epsilon: Maximum perturbation (L∞ bound)
-            alpha: Step size per iteration
-            num_steps: Number of attack iterations
         """
         self.model = model
         self.epsilon = epsilon
@@ -40,11 +32,9 @@ class PGDAttack:
         self.num_steps = num_steps
         
         print(f"PGD Attack initialized")
-        print(f"  Epsilon: {epsilon}")
-        print(f"  Alpha (step size): {alpha}")
-        print(f"  Steps: {num_steps}")
-        
-        
+        print(f"Epsilon: {epsilon}")
+        print(f"Alpha (step size): {alpha}")
+        print(f"Steps: {num_steps}")
         
         
     def generate_single(self, image, label):
@@ -60,11 +50,6 @@ class PGDAttack:
        # adversarial example
        adv_batch, pert_batch = self._pgd_batch(image_batch, label_batch)
        return adv_batch[0], pert_batch[0]
-  
-  
-  
-  
-  
   
   
     def generate_batch(self, images, labels, verbose=True):
@@ -100,8 +85,6 @@ class PGDAttack:
        return adversarial_images.numpy(), perturbations.numpy(), success_rate
    
    
-   
-   
     def _pgd_batch(self, images, labels, verbose=False):
        """
        Internal PGD implementation.
@@ -116,9 +99,7 @@ class PGDAttack:
            perturbations: Final perturbations
        """
        
-       # Initialize with small random perturbation (for better convergence)
-       perturbation = tf.random.uniform(shape=images.shape, minval=-self.epsilon, maxval=self.epsilon, dtype=tf.float32
-       )
+       perturbation = tf.random.uniform(shape=images.shape, minval=-self.epsilon, maxval=self.epsilon, dtype=tf.float32)
       
        # Start with perturbed images
        adv_images = tf.clip_by_value(images + perturbation, 0, 1)
@@ -148,7 +129,6 @@ class PGDAttack:
       
        return adv_images, final_perturbation
   
-
 
     def generate_pgd_dataset(model, images, labels, epsilon=0.03, alpha=0.01, num_steps=10, batch_size=128, verbose=True):
        """
@@ -184,24 +164,18 @@ class PGDAttack:
        return adversarial_images, avg_success_rate
    
    
-   
-   
-    # Quick test
+# Quick test
 if __name__ == "__main__":
-    
    print("\nTesting PGD Attack...\n")
    import sys
    sys.path.append('../../')
    from src.data.cifar10 import load_cifar10
-  
   
    # Load a dataset
    (train_images, train_labels), _, _, class_names = load_cifar10(validation_split=0.1)
    test_images = train_images[:100]
    test_labels = train_labels[:100]
    print(f"Test data: {test_images.shape}\n")
-
-
 
    model = tf.keras.applications.ResNet50(
        weights='imagenet',
