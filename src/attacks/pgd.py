@@ -182,3 +182,57 @@ class PGDAttack:
            print(f"Average attack success rate: {avg_success_rate:.2%}")
       
        return adversarial_images, avg_success_rate
+   
+   
+   
+   
+    # Quick test
+if __name__ == "__main__":
+    
+   print("\nTesting PGD Attack...\n")
+   import sys
+   sys.path.append('../../')
+   from src.data.cifar10 import load_cifar10
+  
+  
+   # Load a dataset
+   (train_images, train_labels), _, _, class_names = load_cifar10(validation_split=0.1)
+   test_images = train_images[:100]
+   test_labels = train_labels[:100]
+   print(f"Test data: {test_images.shape}\n")
+
+
+
+   model = tf.keras.applications.ResNet50(
+       weights='imagenet',
+       include_top=True
+   )
+   print("ResNet50 loaded successfully\n")
+  
+   # Resize images
+   print("Resizing images to 224x224...")
+   test_images_resized = tf.image.resize(test_images, (224, 224)).numpy()
+   print(f"Resized to: {test_images_resized.shape}\n")
+  
+   # PGD attack
+   attacker = PGDAttack(model, epsilon=0.03, alpha=0.01, num_steps=10)
+  
+  
+   # Test single image
+   print("\n[Test 1] Single image attack...")
+   adv_image, perturbation = attacker.generate_single(
+       test_images_resized[0],
+       test_labels[0]
+   )
+   print(f"Generated adversarial example")
+   print(f"Perturbation range: [{perturbation.numpy().min():.4f}, {perturbation.numpy().max():.4f}]")
+  
+   # Test batch
+   print("\n[Test 2] Batch attack (10 images)...")
+   adv_batch, pert_batch, success_rate = attacker.generate_batch(
+       test_images_resized[:10],
+       test_labels[:10],
+       verbose=True
+   )
+  
+   print("All tests completed successfully")
