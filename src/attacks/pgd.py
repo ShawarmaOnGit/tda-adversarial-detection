@@ -98,3 +98,87 @@ class PGDAttack:
            print(f"Attack success rate:   {success_rate:.2%}")
       
        return adversarial_images.numpy(), perturbations.numpy(), success_rate
+   
+   
+   
+   
+    def _pgd_batch(self, images, labels, verbose=False):
+       """
+       Internal PGD implementation.
+      
+       Args:
+           images: Batch of images (TensorFlow tensor)
+           labels: True labels (TensorFlow tensor)
+           verbose: Show iteration progress
+          
+       Returns:
+           adversarial_images: Perturbed images
+           perturbations: Final perturbations
+       """
+       
+       # Initialize with small random perturbation (for better convergence)
+       perturbation = tf.random.uniform(shape=images.shape, minval=-self.epsilon, maxval=self.epsilon, dtype=tf.float32
+       )
+      
+       # Start with perturbed images
+       adv_images = tf.clip_by_value(images + perturbation, 0, 1)
+      
+       # Iterative attack
+       iterator = range(self.num_steps)
+       if verbose:
+           iterator = tqdm(iterator, desc="PGD iterations", leave=False)
+      
+       for step in iterator:
+           adv_images_var = tf.Variable(adv_images)
+           with tf.GradientTape() as tape:
+               tape.watch(adv_images_var)
+               # Forward pass
+               predictions = self.model(adv_images_var, training=False)
+               # Calculate loss
+               loss = tf.keras.losses.sparse_categorical_crossentropy(labels, predictions)
+          
+           gradients = tape.gradient(loss, adv_images_var)
+           adv_images = adv_images_var + self.alpha * tf.sign(gradients)
+          
+           perturbation = adv_images - images
+           perturbation = tf.clip_by_value(perturbation, -self.epsilon, self.epsilon)
+           adv_images = images + perturbation
+           adv_images = tf.clip_by_value(adv_images, 0, 1)
+       final_perturbation = adv_images - images
+      
+       return adv_images, final_perturbation
+  
+
+
+    def generate_pgd_dataset(model, images, labels, epsilon=0.03, alpha=0.01, num_steps=10, batch_size=128, verbose=True):
+       """
+       Convenience function to generate PGD adversarial dataset.
+       """
+       attacker = PGDAttack(model, epsilon=epsilon, alpha=alpha, num_steps=num_steps)
+      
+       all_adversarial = []
+       total_success = 0
+       n_batches = 0
+       if verbose:
+           iterator = tqdm(range(0, len(images), batch_size), desc="Generating PGD attacks")
+       else:
+           iterator = range(0, len(images), batch_size)
+      
+       for i in iterator:
+           batch_images = images[i:i+batch_size]
+           batch_labels = labels[i:i+batch_size]
+           adv_batch, _, success = attacker.generate_batch(batch_images, batch_labels, verbose=False)
+          
+           all_adversarial.append(adv_batch)
+           total_success += success
+           n_batches += 1
+      
+       adversarial_images = np.vstack(all_adversarial)
+       avg_success_rate = total_success / n_batches
+      
+       if verbose:
+           print(f"\nPGD dataset complete")
+           print(f"Total samples: {len(adversarial_images)}")
+           print(f"Average attack success rate: {avg_success_rate:.2%}")
+      
+       return adversarial_images, avg_success_rate
