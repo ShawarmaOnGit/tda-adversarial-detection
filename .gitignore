@@ -8,6 +8,12 @@ build/
 dist/
 *.egg-info/
 
+# Ignore large ML files
+*.npy
+*.h5
+*.keras
+*.pth
+
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
