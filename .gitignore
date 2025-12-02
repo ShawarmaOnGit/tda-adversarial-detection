@@ -17,6 +17,10 @@ data/cifar-10-batches-py/
 data/cifar-10-python.tar.gz
 data/*.npz
 *.npz
+*.npy
+*.h5
+*.keras
+*.pth
 
 # Result files
 results/features/*.npz
